@@ -44,8 +44,9 @@ const Blogs = () => {
     return <div>Loading...</div>;
   }
 
+  console.log(categories);
   return (
-    <div className="mx-auto ">
+    <div className="mx-auto w-4/5">
       <CategoryProvider>
         <Categories categories={categories} />
         <Blog blogs={blogs} />
@@ -53,5 +54,4 @@ const Blogs = () => {
     </div>
   );
 };
-
 export default Blogs;

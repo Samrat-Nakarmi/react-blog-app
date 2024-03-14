@@ -1,31 +1,32 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/api";
+import { CategoryProvider } from "../context/CategoryContext";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const CreateBlog = () => {
-  const [text, SetText] = useState("");
+  const [desctiption, SetDescription] = useState("");
   const [dataCat, setDataCat] = useState("");
-  const [getCategory, setGetCategory] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [time, EventTime] = useState();
 
-  const [title, SetHead] = useState();
+  const [title, SetTitle] = useState();
   const [thumbnailimage, SetThumbnailImage] = useState();
   const [image, SetImage] = useState([]);
 
-  const handleUploadMultiple = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    console.log(selectedFiles);
+  // const handleUploadMultiple = (e) => {
+  //   const selectedFiles = Array.from(e.target.files);
+  //   console.log(selectedFiles);
 
-    // Update the Image state with the array of selected files
-    SetImage(selectedFiles);
-  };
+  //   // Update the Image state with the array of selected files
+  //   SetImage(selectedFiles);
+  // };
 
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
   //       const categoriesResponse = await fetchCategories();
-  //       setGetCategory(categoriesResponse);
+  //       setCategories(categoriesResponse);
   //     } catch (error) {
   //       console.error("Error fetching data:", error);
   //     }
@@ -35,29 +36,44 @@ const CreateBlog = () => {
   // }, []); // Empty dependency array means this effect runs only once after the initial render
 
   // const fetchCategories = async () => {
-  //   console.log();
   //   const response = await fetch("http://127.0.0.1:1337/api/categories");
   //   const data = await response.json();
   //   return data; // Assuming categories are directly under 'data'
   // };
 
-  const handleUpload = (e) => {
-    const selectedFile = e.target.files[0];
-    console.log(selectedFile);
-    if (
-      selectedFile.type === "image/png" ||
-      selectedFile.type === "image/jpg" ||
-      selectedFile.type === "image/svg" ||
-      selectedFile.type === "image/jpeg" ||
-      selectedFile.type === "image/gif" ||
-      selectedFile.type === "image/tiff"
-    ) {
-      SetThumbnailImage(selectedFile);
-      console.log(selectedFile);
-    } else {
-      alert("Wrong image type");
-    }
-  };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const categoriesResponse = await axios.get("/api/categories");
+  //       setCategories(categoriesResponse);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []); // Empty dependency array means this effect runs only once after the initial render
+
+  // console.log(categories);
+
+  // const handleUpload = (e) => {
+  //   const selectedFile = e.target.files[0];
+  //   console.log(selectedFile);
+  //   if (
+  //     selectedFile.type === "image/png" ||
+  //     selectedFile.type === "image/jpg" ||
+  //     selectedFile.type === "image/svg" ||
+  //     selectedFile.type === "image/jpeg" ||
+  //     selectedFile.type === "image/gif" ||
+  //     selectedFile.type === "image/tiff"
+  //   ) {
+  //     SetThumbnailImage(selectedFile);
+  //     console.log(selectedFile);
+  //   } else {
+  //     alert("Wrong image type");
+  //   }
+  // };
+
   // const handleUpload = (e, eventId) => {
   //   const selectedFiles = Array.from(e.target.files);
   //   console.log(selectedFiles);
@@ -73,7 +89,7 @@ const CreateBlog = () => {
   // };
   const handleChange = (e, editor) => {
     const data = editor.getData();
-    SetText(data);
+    SetDescription(data);
   };
 
   const handleSubmit = async (e) => {
@@ -83,7 +99,7 @@ const CreateBlog = () => {
     let createBlogData = {
       data: {
         blogTitle: title,
-        blogDescription: text,
+        blogDescription: desctiption,
       },
     };
 
@@ -96,7 +112,7 @@ const CreateBlog = () => {
 
     let createBlogImageData = new FormData();
 
-    createBlogImageData.append("blogThumbnail", thumbnailimage)
+    createBlogImageData.append("blogThumbnail", thumbnailimage);
 
     for (let i = 0; i < image.length; i++) {
       createBlogImageData.append(image[i]);
@@ -113,24 +129,27 @@ const CreateBlog = () => {
         }
       );
       console.log("Submitted");
-    } catch (error) {
-      console.log("Not submitted: ", error);
-    }
-    try {
-      const response = await axios.post("/api/uploads", createBlogImageData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("Submitted");
+      swal({ title: "Submitted", icon: "success" });
       console.log(response);
+      window.location.reload("/blogs");
     } catch (error) {
       console.log("Not submitted: ", error);
     }
+    // try {
+    //   const response = await axios.post("/api/uploads", createBlogImageData, {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   });
+    //   console.log("Submitted");
+    //   console.log(response);
+    // } catch (error) {
+    //   console.log("Not submitted: ", error);
+    // }
   };
   return (
     <>
-      <section className="w-80">
+      <section className="w-4/5 m-auto">
         <div className="flex gap-5">
           <h1 className="text-4xl pt-12">Create Blog</h1>
         </div>
@@ -145,23 +164,23 @@ const CreateBlog = () => {
               type="text"
               className="p-1 text-sm border border-solid border-[#ccc] rounded-md"
               placeholder="Title*"
-              onChange={(e) => SetHead(e.target.value)}
+              onChange={(e) => SetTitle(e.target.value)}
             />
           </div>
 
-          <div className="article-el">
+          <div className="article-el w-full">
             <CKEditor
               editor={ClassicEditor}
-              data={text}
+              data={desctiption}
               onReady={(editor) => {
                 // You can store the "editor" and use when it is needed.
               }}
               onChange={handleChange}
+              className="h-[25rem]"
             />
-            {text}
           </div>
 
-          <div className="article-el">
+          {/* <div className="article-el">
             <label htmlFor="image" className="text-lg">
               Thumbnail Image
             </label>{" "}
@@ -189,29 +208,30 @@ const CreateBlog = () => {
               onChange={handleUploadMultiple}
               multiple
             />
-          </div>
-
-          {/* <div className="article-el">
-            <label htmlFor="article-image" className="text-lg">
-              Posted by
-            </label>{" "}
-            <br />
-            <select
-              name="opt"
-              id=""
-              onChange={(e) => setDataCat(e.target.value)}
-              value={dataCat}
-              className="w-full mt-2"
-              style={{ borderRadius: "5px" }}
-              required
-            >
-              {getCategory.data.map((options) => (
-                <option value={options.id} key={options._id} required>
-                  {options.attributes.categoryName}
-                </option>
-              ))}
-            </select>
           </div> */}
+          {/* <CategoryProvider>
+            <div className="article-el">
+              <label htmlFor="article-image" className="text-lg">
+                Posted by
+              </label>{" "}
+              <br />
+              <select
+                name="opt"
+                id=""
+                onChange={(e) => setDataCat(e.target.value)}
+                value={dataCat}
+                className="w-full mt-2"
+                style={{ borderRadius: "5px" }}
+                required
+              >
+                {categories.data.map((options) => (
+                  <option value={options.id} key={options._id} required>
+                    {options.attributes.categoryName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </CategoryProvider> */}
 
           <div className="request-form">
             <button type="submit">Submit</button>

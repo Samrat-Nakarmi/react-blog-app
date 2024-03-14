@@ -9,6 +9,7 @@ function App() {
   const CreateBlog = React.lazy(() => import("./components/pages/CreateBlog"));
   const Login = React.lazy(() => import("./components/pages/Login"));
   const Register = React.lazy(() => import("./components/pages/Register"));
+  const BlogDetail = React.lazy(() => import("./components/pages/BlogDetail"));
 
   return (
     <>
@@ -43,6 +44,14 @@ function App() {
           element={
             <Suspense fallback="Loading...">
               <Register />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/blogs/:id"
+          element={
+            <Suspense fallback="Loading...">
+              <BlogDetail />
             </Suspense>
           }
         />
