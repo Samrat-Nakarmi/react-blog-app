@@ -14,13 +14,13 @@ const CreateBlog = () => {
   const [thumbnailimage, SetThumbnailImage] = useState();
   const [image, SetImage] = useState([]);
 
-  // const handleUploadMultiple = (e) => {
-  //   const selectedFiles = Array.from(e.target.files);
-  //   console.log(selectedFiles);
+  const handleUploadMultiple = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    console.log(selectedFiles);
 
-  //   // Update the Image state with the array of selected files
-  //   SetImage(selectedFiles);
-  // };
+    // Update the Image state with the array of selected files
+    SetImage(selectedFiles);
+  };
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -56,23 +56,23 @@ const CreateBlog = () => {
 
   // console.log(categories);
 
-  // const handleUpload = (e) => {
-  //   const selectedFile = e.target.files[0];
-  //   console.log(selectedFile);
-  //   if (
-  //     selectedFile.type === "image/png" ||
-  //     selectedFile.type === "image/jpg" ||
-  //     selectedFile.type === "image/svg" ||
-  //     selectedFile.type === "image/jpeg" ||
-  //     selectedFile.type === "image/gif" ||
-  //     selectedFile.type === "image/tiff"
-  //   ) {
-  //     SetThumbnailImage(selectedFile);
-  //     console.log(selectedFile);
-  //   } else {
-  //     alert("Wrong image type");
-  //   }
-  // };
+  const handleUpload = (e) => {
+    const selectedFile = e.target.files[0];
+    console.log(selectedFile);
+    if (
+      selectedFile.type === "image/png" ||
+      selectedFile.type === "image/jpg" ||
+      selectedFile.type === "image/svg" ||
+      selectedFile.type === "image/jpeg" ||
+      selectedFile.type === "image/gif" ||
+      selectedFile.type === "image/tiff"
+    ) {
+      SetThumbnailImage(selectedFile);
+      console.log(selectedFile);
+    } else {
+      alert("Wrong image type");
+    }
+  };
 
   // const handleUpload = (e, eventId) => {
   //   const selectedFiles = Array.from(e.target.files);
@@ -95,6 +95,8 @@ const CreateBlog = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const token = localStorage.getItem("私は猫が大好き");
+    console.log(token);
     console.log(image);
     let createBlogData = {
       data: {
@@ -110,42 +112,50 @@ const CreateBlog = () => {
     //   },
     // };
 
-    let createBlogImageData = new FormData();
+    // // let createBlogImageData = new FormData();
 
+    // createBlogImageData.append("blogThumbnail", thumbnailimage);
+
+    // for (let i = 0; i < image.length; i++) {
+    //   createBlogImageData.data.blogImages.append(image[i]);
+    // }
+    // console.log(createBlogImageData)
+    // console.log(createBlogImageData.data.blogImages)
+
+    let createBlogImageData = new FormData();
     createBlogImageData.append("blogThumbnail", thumbnailimage);
 
     for (let i = 0; i < image.length; i++) {
-      createBlogImageData.append(image[i]);
+      createBlogImageData.append("blogImages[]", image[i]);
     }
 
+    console.log(createBlogImageData);
     try {
-      const response = await axios.post(
-        "/api/blogs?populate=*",
-        createBlogData,
-        {
+      // Make parallel requests to both endpoints
+      const [blogResponse, imageDataResponse] = await Promise.all([
+        axios.post("/api/blogs?populate=*", createBlogData, {
           headers: {
             "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
           },
-        }
-      );
-      console.log("Submitted");
+        }),
+        axios.post("/api/uploads", createBlogImageData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + token,
+          },
+        }),
+      ]);
+
+      console.log("Blog submitted:", blogResponse);
+      console.log("Image data submitted:", imageDataResponse);
+
       swal({ title: "Submitted", icon: "success" });
-      console.log(response);
       window.location.reload("/blogs");
     } catch (error) {
-      console.log("Not submitted: ", error);
+      console.error("Submission error:", error);
+      swal({ title: "Error", text: "Submission failed", icon: "error" });
     }
-    // try {
-    //   const response = await axios.post("/api/uploads", createBlogImageData, {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   });
-    //   console.log("Submitted");
-    //   console.log(response);
-    // } catch (error) {
-    //   console.log("Not submitted: ", error);
-    // }
   };
   return (
     <>
@@ -180,7 +190,7 @@ const CreateBlog = () => {
             />
           </div>
 
-          {/* <div className="article-el">
+          <div className="article-el">
             <label htmlFor="image" className="text-lg">
               Thumbnail Image
             </label>{" "}
@@ -208,7 +218,7 @@ const CreateBlog = () => {
               onChange={handleUploadMultiple}
               multiple
             />
-          </div> */}
+          </div>
           {/* <CategoryProvider>
             <div className="article-el">
               <label htmlFor="article-image" className="text-lg">

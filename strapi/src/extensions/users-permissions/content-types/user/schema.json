@@ -70,6 +70,12 @@
       "relation": "oneToMany",
       "target": "api::blog.blog",
       "mappedBy": "user"
+    },
+    "comments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::comment.comment",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

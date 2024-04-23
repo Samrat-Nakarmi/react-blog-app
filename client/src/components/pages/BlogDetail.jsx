@@ -4,12 +4,13 @@ import axios from "../../api/api";
 import swal from "sweetalert";
 import HTMLReactParser from "html-react-parser";
 import Masonry from "react-masonry-css";
+import Comments from "../Comments/Comments";
 
 function BlogDetail() {
   const base_url = "http://localhost:1337"; // Assuming this is your base URL
 
   let { id } = useParams();
-
+  console.log(id)
   const breakpoint = {
     default: 4,
     3000: 5,
@@ -79,6 +80,7 @@ function BlogDetail() {
               : null}
           </Masonry>
         </div>
+        <Comments blogId = {id}/>
       </section>
     </div>
   );
