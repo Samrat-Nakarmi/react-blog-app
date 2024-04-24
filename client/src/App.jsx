@@ -10,6 +10,9 @@ function App() {
   const Login = React.lazy(() => import("./components/pages/Login"));
   const Register = React.lazy(() => import("./components/pages/Register"));
   const BlogDetail = React.lazy(() => import("./components/pages/BlogDetail"));
+  const CreateCategory = React.lazy(() =>
+    import("./components/pages/CreateCategories")
+  );
 
   return (
     <>
@@ -52,6 +55,14 @@ function App() {
           element={
             <Suspense fallback="Loading...">
               <BlogDetail />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/create-category"
+          element={
+            <Suspense fallback="Loading...">
+              <CreateCategory />
             </Suspense>
           }
         />
