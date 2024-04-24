@@ -11,8 +11,6 @@ const CreateBlog = () => {
   const [time, EventTime] = useState();
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-
-
   const [title, SetTitle] = useState();
   const [thumbnailimage, SetThumbnailImage] = useState();
   const [image, SetImage] = useState([]);
@@ -30,10 +28,11 @@ const CreateBlog = () => {
     if (checked) {
       setSelectedCategories([...selectedCategories, value]);
     } else {
-      setSelectedCategories(selectedCategories.filter(catId => catId !== value));
+      setSelectedCategories(
+        selectedCategories.filter((catId) => catId !== value)
+      );
     }
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,7 +107,7 @@ const CreateBlog = () => {
       console.log(response);
 
       swal({ title: "Submitted", icon: "success" });
-      // window.location.replace("/blogs");
+      window.location.replace("/blogs");
     } catch (error) {
       console.error("Submission error:", error);
       swal({ title: "Error", text: "Submission failed", icon: "error" });
@@ -184,17 +183,19 @@ const CreateBlog = () => {
             <br />
             {category.map((options) => (
               <div key={options.id}>
-              <input
-                type="checkbox"
-                name="categories"
-                id={`category-${options.id}`}
-                onChange={handleCategoryChange}
-                value={options.id}
-                checked={selectedCategories.includes(options.id)}
-                style={{ borderRadius: "5px" }}
-              />
-              <label htmlFor={`category-${options.id}`}>{options.attributes.categoryName}</label>
-            </div>
+                <input
+                  type="checkbox"
+                  name="categories"
+                  id={`category-${options.id}`}
+                  onChange={handleCategoryChange}
+                  value={options.id}
+                  checked={selectedCategories.includes(options.id)}
+                  style={{ borderRadius: "5px" }}
+                />
+                <label htmlFor={`category-${options.id}`}>
+                  {options.attributes.categoryName}
+                </label>
+              </div>
             ))}
           </div>
 
