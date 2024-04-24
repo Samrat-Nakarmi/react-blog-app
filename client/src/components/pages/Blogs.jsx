@@ -51,6 +51,9 @@ const Blogs = () => {
         <Categories categories={categories} />
         <Blog blogs={blogs} />
       </CategoryProvider>
+      <button className="p-4 mb-24  rounded-lg bg-slate-400">
+        Create Blog
+      </button>
     </div>
   );
 };
