@@ -7,8 +7,11 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 const CreateBlog = () => {
   const [desctiption, SetDescription] = useState("");
   const [dataCat, setDataCat] = useState("");
-  const [categories, setCategories] = useState([]);
+  const [category, setCategories] = useState([]);
   const [time, EventTime] = useState();
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+
 
   const [title, SetTitle] = useState();
   const [thumbnailimage, SetThumbnailImage] = useState();
@@ -22,39 +25,30 @@ const CreateBlog = () => {
     SetImage(selectedFiles);
   };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const categoriesResponse = await fetchCategories();
-  //       setCategories(categoriesResponse);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
+  const handleCategoryChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedCategories([...selectedCategories, value]);
+    } else {
+      setSelectedCategories(selectedCategories.filter(catId => catId !== value));
+    }
+  };
 
-  //   fetchData();
-  // }, []); // Empty dependency array means this effect runs only once after the initial render
 
-  // const fetchCategories = async () => {
-  //   const response = await fetch("http://127.0.0.1:1337/api/categories");
-  //   const data = await response.json();
-  //   return data; // Assuming categories are directly under 'data'
-  // };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const categoriesResponse = await axios.get("/api/categories");
+        setCategories(categoriesResponse.data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const categoriesResponse = await axios.get("/api/categories");
-  //       setCategories(categoriesResponse);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
+    fetchData();
+  }, []); // Empty dependency array means this effect runs only once after the initial render
 
-  //   fetchData();
-  // }, []); // Empty dependency array means this effect runs only once after the initial render
-
-  // console.log(categories);
+  console.log(category);
 
   const handleUpload = (e) => {
     const selectedFile = e.target.files[0];
@@ -74,22 +68,15 @@ const CreateBlog = () => {
     }
   };
 
-  // const handleUpload = (e, eventId) => {
-  //   const selectedFiles = Array.from(e.target.files);
-  //   console.log(selectedFiles);
-
-  //   const updatedEvent = { id: eventId, thumbnail_images: selectedFiles };
-
-  //   // Update the events state with the updated event object
-  //   setEvents((prevEvents) =>
-  //     prevEvents.map((event) => (event.id === eventId ? updatedEvent : event))
-  //   );
-
-  //   console.log(updatedEvent);
-  // };
   const handleChange = (e, editor) => {
     const data = editor.getData();
     SetDescription(data);
+  };
+
+  const data = {
+    blogTitle: title,
+    blogDescription: desctiption,
+    categories: selectedCategories,
   };
 
   const handleSubmit = async (e) => {
@@ -98,60 +85,30 @@ const CreateBlog = () => {
     const token = localStorage.getItem("私は猫が大好き");
     console.log(token);
     console.log(image);
-    let createBlogData = {
-      data: {
-        blogTitle: title,
-        blogDescription: desctiption,
-      },
-    };
 
-    // let createBlogImageData = {
-    //   data: {
-    //     blogThumbnail: thumbnailimage,
-    //     blogImages: [],
-    //   },
-    // };
+    const createBlogData = new FormData();
 
-    // // let createBlogImageData = new FormData();
+    createBlogData.append("data", JSON.stringify(data));
 
-    // createBlogImageData.append("blogThumbnail", thumbnailimage);
-
-    // for (let i = 0; i < image.length; i++) {
-    //   createBlogImageData.data.blogImages.append(image[i]);
-    // }
-    // console.log(createBlogImageData)
-    // console.log(createBlogImageData.data.blogImages)
-
-    let createBlogImageData = new FormData();
-    createBlogImageData.append("blogThumbnail", thumbnailimage);
+    createBlogData.append("files.blogThumbnail", thumbnailimage);
 
     for (let i = 0; i < image.length; i++) {
-      createBlogImageData.append("blogImages[]", image[i]);
+      createBlogData.append("files.blogImages", image[i]);
     }
 
-    console.log(createBlogImageData);
+    console.log(createBlogData);
     try {
       // Make parallel requests to both endpoints
-      const [blogResponse, imageDataResponse] = await Promise.all([
-        axios.post("/api/blogs?populate=*", createBlogData, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
-          },
-        }),
-        axios.post("/api/uploads", createBlogImageData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: "Bearer " + token,
-          },
-        }),
-      ]);
+      const response = await axios.post("/api/blogs", createBlogData, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
 
-      console.log("Blog submitted:", blogResponse);
-      console.log("Image data submitted:", imageDataResponse);
+      console.log(response);
 
       swal({ title: "Submitted", icon: "success" });
-      window.location.reload("/blogs");
+      // window.location.replace("/blogs");
     } catch (error) {
       console.error("Submission error:", error);
       swal({ title: "Error", text: "Submission failed", icon: "error" });
@@ -219,29 +176,27 @@ const CreateBlog = () => {
               multiple
             />
           </div>
-          {/* <CategoryProvider>
-            <div className="article-el">
-              <label htmlFor="article-image" className="text-lg">
-                Posted by
-              </label>{" "}
-              <br />
-              <select
-                name="opt"
-                id=""
-                onChange={(e) => setDataCat(e.target.value)}
-                value={dataCat}
-                className="w-full mt-2"
+
+          <div className="article-el">
+            <label htmlFor="article-image" className="text-lg">
+              Categories
+            </label>{" "}
+            <br />
+            {category.map((options) => (
+              <div key={options.id}>
+              <input
+                type="checkbox"
+                name="categories"
+                id={`category-${options.id}`}
+                onChange={handleCategoryChange}
+                value={options.id}
+                checked={selectedCategories.includes(options.id)}
                 style={{ borderRadius: "5px" }}
-                required
-              >
-                {categories.data.map((options) => (
-                  <option value={options.id} key={options._id} required>
-                    {options.attributes.categoryName}
-                  </option>
-                ))}
-              </select>
+              />
+              <label htmlFor={`category-${options.id}`}>{options.attributes.categoryName}</label>
             </div>
-          </CategoryProvider> */}
+            ))}
+          </div>
 
           <div className="request-form">
             <button type="submit">Submit</button>

@@ -80,7 +80,7 @@ function BlogDetail() {
               : null}
           </Masonry>
         </div>
-        <Comments blogId = {id}/>
+        {/* <Comments blogId = {id}/> */}
       </section>
     </div>
   );
