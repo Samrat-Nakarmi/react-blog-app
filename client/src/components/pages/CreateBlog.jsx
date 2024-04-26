@@ -47,8 +47,6 @@ const CreateBlog = () => {
     fetchData();
   }, []); // Empty dependency array means this effect runs only once after the initial render
 
-  console.log(category);
-
   const handleUpload = (e) => {
     const selectedFile = e.target.files[0];
     console.log(selectedFile);
@@ -75,6 +73,8 @@ const CreateBlog = () => {
   const data = {
     blogTitle: title,
     blogDescription: desctiption,
+    // blogThumbnail: thumbnailimage,
+    // blogImages: image,
     categories: selectedCategories,
   };
 
@@ -107,7 +107,7 @@ const CreateBlog = () => {
       console.log(response);
 
       swal({ title: "Submitted", icon: "success" });
-      window.location.replace("/blogs");
+      // window.location.replace("/blogs");
     } catch (error) {
       console.error("Submission error:", error);
       swal({ title: "Error", text: "Submission failed", icon: "error" });

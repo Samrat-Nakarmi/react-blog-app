@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const Register = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState(null);
+  const [qrImage, SetQRImage] = useState();
   const [register, setRegister] = useState({
     username: "",
     email: "",
@@ -16,6 +17,31 @@ const Register = () => {
     },
   };
 
+  const data = {
+    username: register.username,
+    password: register.password,
+    email: register.email,
+  };
+
+  const handleUpload = (e) => {
+    const selectedFile = e.target.files[0];
+    console.log(selectedFile);
+    if (
+      selectedFile.type === "image/png" ||
+      selectedFile.type === "image/jpg" ||
+      selectedFile.type === "image/svg" ||
+      selectedFile.type === "image/jpeg" ||
+      selectedFile.type === "image/gif" ||
+      selectedFile.type === "image/tiff"
+    ) {
+      SetQRImage(selectedFile);
+      console.log(selectedFile);
+    } else {
+      alert("Wrong image type");
+    }
+  };
+
+  console.log(qrImage)
   const handleChange = (e) => {
     const { name, value } = e.target;
     setRegister((prev) => ({ ...prev, [name]: value }));
@@ -25,9 +51,9 @@ const Register = () => {
     e.preventDefault();
 
     let registerData = new FormData();
-    registerData.append("username", register.username);
-    registerData.append("password", register.password);
-    registerData.append("email", register.email);
+    registerData.append("data", JSON.stringify(data)); // Convert data object to JSON string
+    registerData.append("files.qr", qrImage);
+    
 
     try {
       const response = await axios.post(
@@ -38,6 +64,9 @@ const Register = () => {
       navigate("/login");
       if (response.data.jwt && response.data.user) {
         setMessage(response.message);
+
+        // Retrieve user data from response and store it in local storage
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
 
       if (response.data.error) {
@@ -45,7 +74,6 @@ const Register = () => {
       }
     } catch (error) {
       alert("Could not submit");
-
       console.log(error);
     }
   };
@@ -88,6 +116,18 @@ const Register = () => {
                 className="p-2 mt-2 text-lg font-medium border-2 border-solid border-slate-400 rounded-md"
                 name="email"
                 onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col justify-start mb-4">
+              <label htmlFor="" className="text-lg font-semibold">
+                QR Code
+              </label>
+              <input
+                type="file"
+                placeholder="Enter your email"
+                className="p-2 mt-2 text-lg font-medium border-2 border-solid border-slate-400 rounded-md"
+                name="qr"
+                onChange={handleUpload}
               />
             </div>
             <div className="flex flex-col">

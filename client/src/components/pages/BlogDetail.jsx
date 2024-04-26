@@ -10,7 +10,7 @@ function BlogDetail() {
   const base_url = "http://localhost:1337"; // Assuming this is your base URL
 
   let { id } = useParams();
-  console.log(id)
+  console.log(id);
   const breakpoint = {
     default: 4,
     3000: 5,
@@ -80,7 +80,11 @@ function BlogDetail() {
               : null}
           </Masonry>
         </div>
-        {/* <Comments blogId = {id}/> */}
+        <hr />
+        <div className="mt-12">
+          <h1 className="text-2xl">Comments:</h1>
+          <Comments blogId={id} />
+        </div>
       </section>
     </div>
   );

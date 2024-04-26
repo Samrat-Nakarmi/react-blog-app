@@ -1,34 +1,37 @@
+// @ts-nocheck
 "use strict";
 
 /**
  * comment controller
  */
 
+//@ts-nocheck
 const { createCoreController } = require("@strapi/strapi").factories;
 
 module.exports = createCoreController("api::comment.comment", ({ strapi }) => ({
-  async create(ctx) {
-    console.log("User: ", ctx.state.user);
-    //   const { email, username } = ctx.state.user;
-    //   try {
-    //     const body = ctx.request.body;
-    //     if (!body || typeof body !== 'object') {
-    //       ctx.response.status = 400;
-    //       return { error: 'Request body is missing or invalid' };
-    //     }
+  async create (ctx) {
+    // Extract user ID from JWT token in the Authorization header
+    const userId = ctx.state.user.id;
 
-    //     const res = await strapi.service("api::comment.comment").create({
-    //       data: {
-    //         ...body, // Explicitly type body as Record<string, any>
-    //         email,
-    //         username,
-    //       },
-    //     });
+    try {
+      console.log("Body: ", ctx.request.body);
+      // @ts-ignore
+      console.log("Data: ", ctx.request.body.data);
 
-    //     return res;
-    //   } catch (error) {
-    //     ctx.response.status = 500;
-    //     return error;
-    //   }
+      // @ts-ignore
+      const { content, blog } = ctx.request.body.data;
+
+      const comment = await strapi.service("api::comment.comment").create({
+        data: {
+          content: content,
+          blog: blog,
+          user: userId,
+        },
+      });
+
+      return comment;
+    } catch (error) {
+      ctx.throw(500, "Error creating comment", error);
+    }
   },
 }));

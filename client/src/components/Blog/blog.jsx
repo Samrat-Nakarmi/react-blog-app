@@ -5,7 +5,6 @@ import { CategoryContext } from "../context/CategoryContext";
 
 const Blog = ({ blogs }) => {
   const { category } = useContext(CategoryContext);
-  console.log(blogs);
 
   const filteredBlogs = blogs.filter((blog) => {
     return blog.attributes.categories.data.some(
@@ -13,6 +12,7 @@ const Blog = ({ blogs }) => {
     );
   });
 
+  console.log(filteredBlogs);
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {filteredBlogs?.map((blog) => (

@@ -11,7 +11,7 @@ function App() {
   const Register = React.lazy(() => import("./components/pages/Register"));
   const BlogDetail = React.lazy(() => import("./components/pages/BlogDetail"));
   const CreateCategory = React.lazy(() =>
-    import("./components/pages/CreateCategories")
+    import("./components/pages/CreateCategory")
   );
 
   return (

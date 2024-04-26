@@ -457,7 +457,7 @@ export interface ApiCommentComment extends Schema.CollectionType {
       'manyToOne',
       'api::blog.blog'
     >;
-    users_permissions_user: Attribute.Relation<
+    user: Attribute.Relation<
       'api::comment.comment',
       'manyToOne',
       'plugin::users-permissions.user'
@@ -893,6 +893,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::comment.comment'
     >;
+    qr: Attribute.Media;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
